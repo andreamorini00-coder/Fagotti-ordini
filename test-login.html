@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="background:#1a1207;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:32px">
+  <input id="pwd" type="password" placeholder="password" style="padding:12px;font-size:18px;border-radius:8px;border:none;text-align:center;width:280px">
+  <div id="msg" style="color:#f87171;font-family:sans-serif"></div>
+  <button onclick="login()" style="padding:14px;background:#c9a84c;border:none;border-radius:12px;font-size:16px;font-weight:700;width:280px;cursor:pointer">Entra</button>
+  <div id="out" style="color:#fff;font-family:sans-serif"></div>
+  <script>
+  function login(){
+    var v=document.getElementById('pwd').value;
+    if(v==='fagotti2024'){
+      document.getElementById('out').textContent='LOGIN OK!';
+      document.getElementById('out').style.color='#22c55e';
+    } else {
+      document.getElementById('msg').textContent='Errata: '+v;
+    }
+  }
+  document.getElementById('pwd').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+  document.getElementById('out').textContent='Pagina caricata OK';
+  </script>
+</body>
+</html>
