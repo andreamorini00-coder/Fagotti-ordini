@@ -408,26 +408,110 @@ function rP(){
 }
 
 // STAMPA
+var TCOLORS={
+  "Afrodite":"#f9a8d4","Black Forest":"#7c3aed","Brownie":"#92400e","Caprese":"#fbbf24",
+  "Cestino Fagottini":"#f97316","Charlotte cioccolato":"#78350f","Charlotte limone":"#fef08a",
+  "Cheesecake":"#fde68a","Cream tart":"#fbcfe8","Crema al burro":"#fef3c7",
+  "Crostata marmellata":"#fca5a5","Crostata cioccolato":"#92400e","Crostata ricotta":"#e9d5ff",
+  "Crostata frutta":"#bbf7d0","Diplomatica":"#fde68a","Dolce castagne":"#d97706",
+  "Dolce arachidi/nocciole":"#d97706","Dolce Fagotti":"#c9a84c","Dolce Ilaria":"#f9a8d4",
+  "Kinder":"#fbbf24","Lemon tart":"#fef08a","Mandarinoir":"#fb923c",
+  "Marika":"#f472b6","Meringata cioccolato/fragole":"#fca5a5","Meringata frutti bosco":"#c4b5fd",
+  "Meringata limone/castagne":"#fef08a","Millefoglie classico":"#fde68a",
+  "Millefoglie frutti bosco":"#a78bfa","Millefoglie fragole":"#fca5a5",
+  "Mimosa":"#fef08a","Montblanc":"#d1d5db","Moretta":"#6b7280",
+  "Ohana":"#6ee7b7","Pasta zucchero":"#fbcfe8","Pastiera":"#bbf7d0",
+  "Pavlova":"#e9d5ff","Profitterole":"#78350f","Red Velvet":"#ef4444",
+  "Sacher":"#7c3aed","Saint Honorè":"#fde68a","Serendipity":"#f9a8d4",
+  "Settembrina":"#fb923c","Struffoli":"#fbbf24","Sveva":"#a78bfa",
+  "Tiramisù classico":"#93c5fd","Tiramisù fragole":"#fca5a5",
+  "Tre cioccolati":"#78350f","Tronchetto Natale":"#86efac",
+  "Ugly cake":"#d1d5db","Zuccotto":"#c4b5fd","Torta Gelato":"#bae6fd",
+  "Zuppa inglese":"#fca5a5"
+};
+function getTCol(nome){return TCOLORS[nome]||"#f3f4f6";}
+
 function printDay(){
   var dates=wDates(wOff),ts=td(),target=ts,gi=dates.indexOf(ts);
   if(opg(ts).length===0){for(var i=0;i<dates.length;i++){if(opg(dates[i]).length>0){target=dates[i];gi=i;break;}}}
   var day=opg(target),nome=gi>=0?GIORNI[gi]:"";
   var rows="";
-  day.forEach(function(o){
+  day.forEach(function(o,idx){
     var lines=[],tot=calcTot(o);
-    if(o.prodotto){var pw=o.modo==="pz"?(o.pezzi||1)+" pz":(o.modo==="kg"?(o.peso||"1kg"):(o.persone||8)+"p");var l="🎂 "+xe(o.prodotto)+" · "+pw;if(o.farcitura)l+=" | "+xe(o.farcitura);if(o.decorazione)l+=" | "+xe(o.decorazione);lines.push(l);}
-    if(o.torteExtra) o.torteExtra.forEach(function(t){var pw=t.modo==="pz"?(t.pezzi||1)+" pz":(t.modo==="kg"?(t.peso||"1kg"):(t.persone||8)+"p");lines.push("🎂 "+xe(t.prodotto)+" · "+pw);});
-    if(o.salProdotto) lines.push("🥗 "+xe(o.salProdotto)+" · "+(o.salModo==="kg"?(o.salPeso||"1kg"):(o.salQta||1)+" pz"));
-    if(o.salatiExtra) o.salatiExtra.forEach(function(s){lines.push("🥗 "+xe(s.prodotto)+" · "+(s.modo==="kg"?(s.peso||"1kg"):(s.qta||1)+" pz"));});
-    rows+='<tr><td style="padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top;font-weight:700">'+xe(o.cliente)+(o.orario?'<br><span style="color:#c9a84c;font-size:13px">⏰ '+o.orario+'</span>':'')+(o.telefono?'<br><span style="font-weight:400;font-size:12px;color:#888">'+xe(o.telefono)+'</span>':'')+'</td><td style="padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top;font-size:14px">'+lines.join("<br>")+(o.note?'<br><span style="font-size:12px;color:#888">📝 '+xe(o.note)+'</span>':'')+'</td><td style="padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top;text-align:right;white-space:nowrap">'+(tot>0?"€ "+tot.toFixed(2):"—")+(o.consegna?' 🚗':'')+'</td></tr>';
+    var bgColor="#ffffff";
+    // determina colore principale dall'ordine
+    if(o.prodotto) bgColor=getTCol(o.prodotto);
+
+    if(o.prodotto){
+      var pw=o.modo==="pz"?(o.pezzi||1)+" pz":(o.modo==="kg"?(o.peso||"1kg"):(o.persone||8)+"p");
+      var l="🎂 <strong>"+xe(o.prodotto)+"</strong> · "+pw;
+      if(o.farcitura) l+=" | "+xe(o.farcitura);
+      if(o.decorazione) l+=' | <em>'+xe(o.decorazione)+"</em>";
+      lines.push(l);
+    }
+    if(o.torteExtra) o.torteExtra.forEach(function(t){
+      var pw=t.modo==="pz"?(t.pezzi||1)+" pz":(t.modo==="kg"?(t.peso||"1kg"):(t.persone||8)+"p");
+      var l="🎂 <strong>"+xe(t.prodotto)+"</strong> · "+pw;
+      if(t.farcitura) l+=" | "+xe(t.farcitura);
+      if(t.decorazione) l+=' | <em>'+xe(t.decorazione)+"</em>";
+      lines.push(l);
+    });
+    if(o.salProdotto) lines.push("🥗 <strong>"+xe(o.salProdotto)+"</strong> · "+(o.salModo==="kg"?(o.salPeso||"1kg"):(o.salQta||1)+" pz"));
+    if(o.salatiExtra) o.salatiExtra.forEach(function(s){lines.push("🥗 <strong>"+xe(s.prodotto)+"</strong> · "+(s.modo==="kg"?(s.peso||"1kg"):(s.qta||1)+" pz"));});
+
+    rows+='<tr style="background:'+bgColor+';border-left:6px solid '+bgColor.replace('f','c')+'">';
+    rows+='<td style="padding:12px 14px;vertical-align:top;border-bottom:3px solid #fff;min-width:130px">';
+    rows+='<div style="font-size:17px;font-weight:800;color:#1a1207">'+xe(o.cliente)+'</div>';
+    if(o.orario) rows+='<div style="font-size:15px;font-weight:700;color:#c9a84c;margin-top:2px">⏰ '+o.orario+'</div>';
+    if(o.telefono) rows+='<div style="font-size:13px;color:#666;margin-top:2px">📞 '+xe(o.telefono)+'</div>';
+    if(o.consegna) rows+='<div style="font-size:12px;color:#9a3412;margin-top:2px;font-weight:700">🚗 CONSEGNA</div>';
+    rows+='</td>';
+    rows+='<td style="padding:12px 14px;vertical-align:top;border-bottom:3px solid #fff;font-size:15px;line-height:1.8">';
+    rows+=lines.join("<br>");
+    if(o.note) rows+='<br><span style="font-size:13px;color:#666;font-style:italic">📝 '+xe(o.note)+'</span>';
+    rows+='</td>';
+    rows+='<td style="padding:12px 14px;vertical-align:top;border-bottom:3px solid #fff;text-align:right;white-space:nowrap">';
+    if(tot>0) rows+='<div style="font-size:18px;font-weight:800;color:#1a1207">€ '+tot.toFixed(2)+'</div>';
+    else rows+='<div style="font-size:18px;color:#aaa">—</div>';
+    rows+='</td></tr>';
   });
-  if(!rows) rows='<tr><td colspan="3" style="padding:20px;text-align:center;color:#aaa">Nessun ordine</td></tr>';
-  var w=window.open('','_blank','width=650,height=850');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ordini '+nome+' '+fdf(target)+'</title><style>body{font-family:sans-serif;padding:24px;color:#1a1207}h1{font-size:18px;margin-bottom:2px}h2{font-size:13px;color:#888;font-weight:400;margin-bottom:20px}table{width:100%;border-collapse:collapse}th{background:#1a1207;color:#c9a84c;padding:10px;text-align:left;font-size:12px}@media print{.np{display:none}}</style></head><body>');
-  w.document.write('<h1>Pasticceria Artigianale Fagotti</h1><h2>Ordini — '+nome+' '+fdf(target)+'</h2>');
-  w.document.write('<table><thead><tr><th>Cliente</th><th>Prodotto</th><th style="text-align:right">Totale</th></tr></thead><tbody>'+rows+'</tbody></table>');
-  w.document.write('<p style="margin-top:16px;font-size:11px;color:#aaa">Stampato il '+fdf(td())+'</p>');
-  w.document.write('<button class="np" onclick="window.print()" style="margin-top:8px;padding:10px 20px;background:#1a1207;color:#c9a84c;border:none;border-radius:8px;cursor:pointer;font-size:14px">🖨️ Stampa</button>');
+
+  if(!rows) rows='<tr><td colspan="3" style="padding:20px;text-align:center;color:#aaa;font-size:16px">Nessun ordine</td></tr>';
+
+  var totGiorno=day.reduce(function(s,o){return s+calcTot(o);},0);
+
+  var w=window.open('','_blank','width=700,height=900');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  w.document.write('<title>Ordini '+nome+' '+fdf(target)+'</title>');
+  w.document.write('<style>');
+  w.document.write('*{box-sizing:border-box;margin:0;padding:0}');
+  w.document.write('body{font-family:Georgia,serif;background:#fff;color:#1a1207;padding:20px 24px}');
+  w.document.write('.header{border-bottom:3px solid #1a1207;padding-bottom:12px;margin-bottom:20px}');
+  w.document.write('.header h1{font-size:22px;font-weight:900;color:#1a1207}');
+  w.document.write('.header h2{font-size:16px;color:#c9a84c;font-weight:700;margin-top:4px}');
+  w.document.write('.header .meta{font-size:13px;color:#888;margin-top:4px}');
+  w.document.write('table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden}');
+  w.document.write('thead tr{background:#1a1207}');
+  w.document.write('thead th{color:#c9a84c;padding:12px 14px;text-align:left;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase}');
+  w.document.write('thead th:last-child{text-align:right}');
+  w.document.write('.footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid #1a1207;padding-top:12px}');
+  w.document.write('.footer .tot{font-size:20px;font-weight:900}');
+  w.document.write('.footer .meta{font-size:12px;color:#888}');
+  w.document.write('@media print{.np{display:none}body{padding:10px}thead tr{-webkit-print-color-adjust:exact;print-color-adjust:exact}tr{-webkit-print-color-adjust:exact;print-color-adjust:exact}}');
+  w.document.write('</style></head><body>');
+  w.document.write('<div class="header">');
+  w.document.write('<h1>Pasticceria Artigianale Fagotti</h1>');
+  w.document.write('<h2>'+nome+' '+fdf(target)+'</h2>');
+  w.document.write('<div class="meta">'+day.length+' ordini</div>');
+  w.document.write('</div>');
+  w.document.write('<table><thead><tr><th>Cliente</th><th>Prodotto</th><th style="text-align:right">Totale</th></tr></thead><tbody>');
+  w.document.write(rows);
+  w.document.write('</tbody></table>');
+  w.document.write('<div class="footer">');
+  w.document.write('<div class="meta">Stampato il '+fdf(td())+'</div>');
+  if(totGiorno>0) w.document.write('<div class="tot">Totale giorno: € '+totGiorno.toFixed(2)+'</div>');
+  w.document.write('</div>');
+  w.document.write('<br><button class="np" onclick="window.print()" style="padding:12px 24px;background:#1a1207;color:#c9a84c;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700">🖨️ Stampa</button>');
   w.document.write('</body></html>');
   w.document.close();
 }
