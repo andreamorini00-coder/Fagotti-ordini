@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Fagotti — Ordini</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--nero:#1a1207;--oro:#c9a84c;--oro-l:#fdf5e0;--cream:#faf8f5;--brd:#e0d8cc}
@@ -226,10 +224,6 @@ textarea.fi{resize:vertical}
 
 <script>
 var db=null;
-try{
-  firebase.initializeApp({apiKey:"AIzaSyDTZFJlCeH6pmwE3tp3qU5dGh7x6XrHe2Q",authDomain:"ordini-fagotti-bd9d8.firebaseapp.com",projectId:"ordini-fagotti-bd9d8",storageBucket:"ordini-fagotti-bd9d8.firebasestorage.app",messagingSenderId:"968063747672",appId:"1:968063747672:web:6c2476600dfeea517cec2d"});
-  db=firebase.firestore();
-}catch(e){console.warn("Firebase init error:",e);}
 
 var LISTINO={"Afrodite":30,"Black Forest":27,"Brownie":27,"Caprese":27,"Cestino Fagottini":35,"Charlotte cioccolato":27,"Charlotte limone":35,"Cheesecake":30,"Cream tart":30,"Crema al burro":30,"Crostata marmellata":27,"Crostata cioccolato":27,"Crostata ricotta":27,"Crostata frutta":30,"Diplomatica":27,"Dolce castagne":35,"Dolce arachidi/nocciole":35,"Dolce Fagotti":30,"Dolce Ilaria":27,"Kinder":27,"Lemon tart":30,"Mandarinoir":35,"Marika":35,"Meringata cioccolato/fragole":27,"Meringata frutti bosco":30,"Meringata limone/castagne":35,"Millefoglie classico":27,"Millefoglie frutti bosco":30,"Millefoglie fragole":27,"Mimosa":27,"Montblanc":35,"Moretta":27,"Ohana":30,"Pasta zucchero":35,"Pastiera":30,"Pavlova":30,"Profitterole":27,"Red Velvet":30,"Sacher":27,"Saint Honorè":27,"Serendipity":35,"Settembrina":35,"Struffoli":35,"Sveva":35,"Tiramisù classico":30,"Tiramisù fragole":30,"Tre cioccolati":30,"Tronchetto Natale":35,"Ugly cake":30,"Zuccotto":27,"Torta Gelato":27,"Zuppa inglese":27};
 var SAL_KG=["Bottoncini/cornettini/genovesi","Pizzette/rustici","Torte rustiche"];
@@ -258,26 +252,43 @@ function doLogin(){
     sessionStorage.setItem("fa","1");
     G("login").classList.add("hidden");
     G("app").classList.add("on");
-    startApp();
+    loadFirebase();
   } else {
     G("lerr").textContent="Password errata.";
     G("pwd").value="";
   }
 }
-document.addEventListener("DOMContentLoaded",function(){
-  G("pwd").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
-  if(sessionStorage.getItem("fa")){
-    G("login").classList.add("hidden");
-    G("app").classList.add("on");
-    startApp();
-  }
-});
+
+function loadFirebase(){
+  // Load Firebase scripts dynamically after login
+  var s1=document.createElement("script");
+  s1.src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js";
+  s1.onload=function(){
+    var s2=document.createElement("script");
+    s2.src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js";
+    s2.onload=function(){
+      try{
+        firebase.initializeApp({apiKey:"AIzaSyDTZFJlCeH6pmwE3tp3qU5dGh7x6XrHe2Q",authDomain:"ordini-fagotti-bd9d8.firebaseapp.com",projectId:"ordini-fagotti-bd9d8",storageBucket:"ordini-fagotti-bd9d8.firebasestorage.app",messagingSenderId:"968063747672",appId:"1:968063747672:web:6c2476600dfeea517cec2d"});
+        db=firebase.firestore();
+      }catch(e){console.warn(e);}
+      startApp();
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+G("pwd").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+if(sessionStorage.getItem("fa")){
+  G("login").classList.add("hidden");
+  G("app").classList.add("on");
+  loadFirebase();
+}
 
 // FIREBASE
 function sync(s){var m={ok:["#22c55e","● Sync"],lo:["#f59e0b","● ..."],er:["#ef4444","● Err"]};G("sdot").style.background=m[s][0];G("slbl").textContent=m[s][1];G("slbl").style.color=m[s][0];}
 function startApp(){
   G("fdata").value=td();
-  if(!db){sync("er");G("v0").innerHTML='<div style="padding:20px;color:#f87171;font-family:sans-serif;text-align:center">Errore connessione Firebase</div>';return;}
+  if(!db){sync("lo");setTimeout(startApp,300);return;}
   sync("lo");
   db.collection("ordini").onSnapshot(function(snap){
     ordini=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
