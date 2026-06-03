@@ -124,7 +124,7 @@ textarea.fi{resize:vertical}
   <div class="ls">Accesso riservato al team</div>
   <input class="li" type="password" id="pwd" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="off">
   <div class="le" id="lerr"></div>
-  <button class="lb" id="btn-login">Entra &rarr;</button>
+  <button class="lb" onclick="doLogin()">Entra &rarr;</button>
 </div>
 
 <div id="app">
@@ -262,21 +262,16 @@ function doLogin(){
   }
 }
 
-function initAuth(){
-  G("btn-login").addEventListener("click",doLogin);
-  G("pwd").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+// pwd enter key
+document.addEventListener("DOMContentLoaded",function(){
+  var p=G("pwd");
+  if(p) p.addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
   if(sessionStorage.getItem("fa")){
     G("login").classList.add("hidden");
     G("app").classList.add("on");
     startApp();
   }
-}
-
-if(document.readyState==="loading"){
-  document.addEventListener("DOMContentLoaded",initAuth);
-} else {
-  initAuth();
-}
+});
 
 // FIREBASE
 function sync(s){var m={ok:["#22c55e","● Sync"],lo:["#f59e0b","● ..."],er:["#ef4444","● Err"]};G("sdot").style.background=m[s][0];G("slbl").textContent=m[s][1];G("slbl").style.color=m[s][0];}
