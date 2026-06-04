@@ -340,7 +340,7 @@ function rA(){
     var day=opg(date),isT=date===ts;
     if(isT&&day.length>0&&openD[date]===undefined) openD[date]=true;
     var open=!!openD[date];
-    h+='<div class="dacc'+(isT?" today":"")+'"><div class="dtr" onclick="togD(\''+date+'\')"><div style="display:flex;align-items:center;gap:10px"><span class="dn">'+GIORNI[i]+'</span><span style="font-size:12px;opacity:.6;font-family:sans-serif">'+fd(date)+'</span></div><div class="dr"><span class="dc'+(day.length?" has":"")+'">'+day.length+'</span><span class="da" id="da-'+date+'" style="transform:'+(open?"rotate(90deg)":"rotate(0deg)")+'">›</span></div></div>';
+    h+='<div class="dacc'+(isT?" today":"")+'"><div class="dtr" onclick="togD(\''+date+'\')"><div style="display:flex;align-items:center;gap:10px"><span class="dn">'+GIORNI[i]+'</span><span style="font-size:12px;opacity:.6;font-family:sans-serif">'+fd(date)+'</span></div><div class="dr"><span class="dc'+(day.length?" has":"")+'">'+day.length+'</span>'+(day.length>0?'<button onclick="event.stopPropagation();printDay(\''+date+'\')" style="background:none;border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px;color:'+(isT?'#c9a84c':'#888')+';line-height:1" title="Stampa '+(GIORNI[i])+'">🖨️</button>':'')+' <span class="da" id="da-'+date+'" style="transform:'+(open?"rotate(90deg)":"rotate(0deg)")+'">›</span></div></div>';
     h+='<div class="dbody'+(open?" open":"")+'" id="db-'+date+'">';
     if(!day.length){h+='<div class="ed">Nessun ordine</div>';}
     else{day.forEach(function(o){
